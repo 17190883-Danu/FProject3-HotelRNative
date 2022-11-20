@@ -1,28 +1,26 @@
-import React, {useState} from "react";
-import { View, Text, Button, StyleSheet, StatusBar, Image } from "react-native";
-import { TextInput } from "react-native-gesture-handler";
+// import React from "react";
+import React, {useState, useEffect} from 'react';
+import { View, Text, Button, StyleSheet, Image, TextInput } from "react-native";
 
 const HomeScreen = ({navigation}) => {
-    
-    const [input, setInput] = useState('')
-
+    const [search, setSearch] = useState('');
     return (
         <View style={styles.container}>
-             <Image 
-                source={require('hotelfp/assets/icons/home.png')} 
-                resizeMode='contain'
+            <Image 
+                source={require('hotelfp/assets/icons/home.png')}
                 style={{
                     width: 25,
                     height: 25,
+                    alignItems: 'row',
                 }}
             />
-        <TextInput 
-            style={styles.textinput}
-            placeholder="Masukkan"
-            onChangeText={text => setInput(text)}
-            defaultValue={input}    
-        />
-        <StatusBar style="auto" />
+            <TextInput
+                style={styles.textInputStyle}
+                onChangeText={(text) => searchFilterFunction(text)}
+                value={search}
+                underlineColorAndroid="transparent"
+                placeholder="Search Here"
+            />
         </View>
     );
 };
@@ -32,15 +30,16 @@ export default HomeScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // alignItems: 'center',
+        alignItems: 'center',
         // justifyContent: 'center',
-        backgroundColor: "#8fcbbc",
-        flexDirection: 'row',
-        textAlign: 'center'
+        backgroundColor: "#8fcbbc"
     },
-    textinput: {
+    textInputStyle: {
         height: 40,
-        // alignItems: 'center',
-        textAlign: 'center'
-    }
+        borderWidth: 1,
+        paddingLeft: 20,
+        margin: 5,
+        borderColor: '#009688',
+        backgroundColor: '#FFFFFF',
+      },
 });
