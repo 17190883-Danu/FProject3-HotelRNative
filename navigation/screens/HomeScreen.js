@@ -3,6 +3,8 @@ import React, {useState, useEffect} from 'react';
 import { SafeAreaView, ScrollView, View, Text, Button, StyleSheet, Image, TextInput, StatusBar } from "react-native";
 import { Button as ButtonB } from '@rneui/themed';
 
+import SearchHotel from '../SearchHotel';
+
 import { Card } from 'react-native-paper';
 
 const HomeScreen = ({navigation}) => {
@@ -94,7 +96,8 @@ const HomeScreen = ({navigation}) => {
 
             {/* BUTTON SEARCH */}
             <ButtonB
-                // ViewComponent={Search} // Don't forget this!
+                //  component={SearchHotel}
+                // ViewComponent={SearchHotel} // Don't forget this!
                 // linearGradientProps={{
                 //     colors: ["#FF9800", "#F44336"],
                 //     start: { x: 0, y: 0.5 },
