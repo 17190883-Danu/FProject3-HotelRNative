@@ -1,5 +1,5 @@
 // import React from "react";
-import axios from 'axios';
+// import axios from 'axios';
 import React, {useState, useEffect} from 'react';
 import { SafeAreaView, ScrollView, View, Text, Button, StyleSheet, Image, TextInput, StatusBar } from "react-native";
 import { Button as ButtonB } from '@rneui/themed';
@@ -7,24 +7,24 @@ import { Button as ButtonB } from '@rneui/themed';
 import { Card } from 'react-native-paper';
 
 const HomeScreen = ({navigation}) => {
-    const getData = async () => {
-        try {
-            const res= await axios.get('https://hotels4.p.rapidapi.com/v2/get-meta-data', {
-                headers: {
-                    apiKey: 'b81885abf3mshe701430ff57723dp142880jsn3bf6349f6474',
-                    apiHost: 'hotels4.p.rapidapi.com',
-                },
-            });
+    // const getData = async () => {
+    //     try {
+    //         const res= await axios.get('https://hotels4.p.rapidapi.com/v2/get-meta-data', {
+    //             headers: {
+    //                 apiKey: 'b81885abf3mshe701430ff57723dp142880jsn3bf6349f6474',
+    //                 apiHost: 'hotels4.p.rapidapi.com',
+    //             },
+    //         });
 
-            console.log(res);
-        } catch (error) {
-            alert(error.message);
-        }
-    };
+    //         console.log(res);
+    //     } catch (error) {
+    //         alert(error.message);
+    //     }
+    // };
 
-    useEffect(() => {
-        getData()
-    }, [])
+    // useEffect(() => {
+    //     getData()
+    // }, [])
 
     const [search, setSearch] = useState('');
 
