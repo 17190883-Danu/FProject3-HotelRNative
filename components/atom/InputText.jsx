@@ -12,19 +12,20 @@ const InputText = ({
     label,
     placeholder,
     value,
-    onChangeText,
     secureTextEntry,
     iconSrc,
     style,
     keyboardType,
     autoCapitalize,
+    onChangeText,
+    autoFocus,
     isPassword,
     editable
 }) => {
-    // const [value, setValue] = useState();
+    // const [value, setValue] = useState(paramValue);
     return (
         <View style={[style]}>
-            <Text style={styles.label}>{label}</Text>
+            {label && <Text style={styles.label}>{label}</Text>}
             <View style={styles.input}>
                 {iconSrc && <Image source={iconSrc} resizeMode='contain' style={styles.icon} />}
                 <TextInput
@@ -33,6 +34,7 @@ const InputText = ({
                     secureTextEntry={secureTextEntry}
                     keyboardType={keyboardType}
                     autoCapitalize={autoCapitalize}
+                    autoFocus={autoFocus}
                     onChangeText={onChangeText}
                     editable={editable}
                     style={styles.inputField}
@@ -72,17 +74,18 @@ const styles = StyleSheet.create({
 })
 
 InputText.defaultProps = {
-    secureTextEntry: false,
+    label: null,
+    secureTextEntry: false, 
     iconSrc: null,
     value: '',
     keyboardType: 'default',
     autoCapitalize: 'sentence',
+    autoFocus: false,
     isPassword: false,
     editable: true,
 }
 
 InputText.propTypes = {
-    label: propTypes.string.isRequired,
     placeholder: propTypes.string.isRequired,
 }
 

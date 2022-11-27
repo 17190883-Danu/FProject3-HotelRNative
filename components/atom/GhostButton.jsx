@@ -3,19 +3,28 @@ import PropTypes from 'prop-types';
 import {
     View,
     Text,
+    Image,
     TouchableOpacity,
-    StyleSheet
+    StyleSheet,
 } from 'react-native';
 
 const GhostButton = ({
     label,
     icon,
+    type,
+    value,
     onPress,
     style
 }) => {
     return (
-        <TouchableOpacity style={styles.container}>
-            <Text style={styles.text}>{label}</Text>
+        <TouchableOpacity onPress={onPress} style={styles.container}>
+            {icon && <Image source={icon} style={styles.icon} />}
+            <View>
+                <Text style={{...styles.text, color: type === 'danger' ? '#e32f45' : '#1c1c1c'}}>{label}</Text>
+                {
+                    value && <Text style={styles.value}>{value}</Text>
+                }
+            </View>
         </TouchableOpacity>
     )
 }
@@ -24,13 +33,32 @@ const styles = StyleSheet.create({
     container: {
         // backgroundColor: 'white',
         // backgroundColor: 'red',
+        flexDirection: 'row',
+        alignItems: 'center',
         width: '100%',
         paddingVertical: 16,
+    },
+    icon: {
+        width: 16,
+        aspectRatio: 1,
+        resizeMode: 'contain',
+        marginRight: 16,
     },
     text: {
         fontSize: 14,
         fontFamily: 'Poppins-Medium',
+    },
+    value: {
+        fontSize: 12,
+        fontFamily: 'Poppins-Regular',
     }
 })
+
+GhostButton.defaultProps = {
+    label: 'Button',
+    icon: null,
+    type: 'primary',
+    value: null,
+}
 
 export default GhostButton

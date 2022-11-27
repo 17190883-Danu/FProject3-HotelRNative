@@ -2,8 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 // import bcrypt from 'react-native-bcrypt'
 
-const userData = require('../user.json')
-
 const initialState = {
     isLoginPending: false,
     isLoginSuccess: false,
@@ -40,31 +38,48 @@ const destroySession = async () => {
     }
 }
 
+const getUserData = async () => {
+    try {
+        await AsyncStorage.getItem('user')
+        .then((res) => {
+            // console.log('res ', res)
+            return res
+        })
+    } catch (e) {
+        console.warn(e)
+    }
+}
+
 export const authLogin = createAsyncThunk('auth/login', async ({email, password}) => {
     try {
-        const user = userData.find(user => user.email === email && user.password === password)
-        const sessionInfo = {
-            id: user.id,
-            first_name: user.first_name,
-            last_name: user.last_name,
-        }
-        // console.log('pass ', user.password) 
-        // const checkPass = user ? bcrypt.compareSync(password, user.password) : false
-        // console.log('checkPass ', checkPass) Note: taking too long to compare
-        if(sessionInfo) {
-            storeSession(sessionInfo).then(() => {
-                console.warn('Login success')
-                return user
-            })
-        } else {
-            throw new Error('Invalid email or password')
-        }
+        await AsyncStorage.getItem('user').then((res) => {
+            // console.log('res', res)
+            const user = JSON.parse(res).find(user => user.email === email && user.password === password)
+            // console.log('user ', user)
+            const sessionInfo = {
+                id: user.id,
+                first_name: user.first_name,
+                last_name: user.last_name,
+            }
+            // console.log('pass ', user.password) 
+            // const checkPass = user ? bcrypt.compareSync(password, user.password) : false
+            // console.log('checkPass ', checkPass) Note: taking too long to compare
+            if(sessionInfo) {
+                console.log('ere')
+                storeSession(sessionInfo).then(() => {
+                    console.warn('Login success')
+                    return user
+                })
+            } else {
+                throw new Error('Invalid email or password')
+            }
+        })
     } catch (err) {
         console.warn(err)
     }
 })
 
-export const authLogout = createAsyncThunk('auth/login', async ({email, password}) => {
+export const authLogout = createAsyncThunk('auth/logout', async () => {
     try {
         destroySession().then(() => {
             console.warn('Logout success')

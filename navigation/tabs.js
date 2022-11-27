@@ -16,7 +16,7 @@ const Tab = createBottomTabNavigator();
 
 const Tabs = () => {
     const [userSession, setUserSession] = useState(null);
-    const [isLogin, setIsLogin] = useState(false);
+    // const [isLogin, setIsLogin] = useState(false);
     const userState = useSelector((state) => state.auth)
     const dispatch = useDispatch()
     
@@ -24,8 +24,9 @@ const Tabs = () => {
         await AsyncStorage.getItem('session')
         .then((res) => {
             if(res !== null) {
-                setIsLogin(true)
                 setUserSession(res)
+            } else {
+                setUserSession(null)
             }
             // console.log('sessionHere ', res)
             return res
@@ -94,7 +95,7 @@ const Tabs = () => {
             }}/>
 
             {/* NAV PROFIL & LOGIN */}
-            {isLogin === true ? (
+            {userSession !== null ? (
                 <Tab.Screen name="Profil" component={ProfilScreen} options={{
                 tabBarIcon: ({focused}) => (
                     <View style={{alignItems: 'center', justifyContent: 'center', top: 10, paddingBottom: 12,}}>

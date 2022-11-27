@@ -4,6 +4,17 @@
         "first_name": "Abid",
         "last_name": "Mafahim",
         "email": "abid@email.com",
+        "dial_code": "ID",
+        "phone_number": "8123456789",
         "password": "user"
+    },
+    {
+        "id": 2,
+        "first_name": "John",
+        "last_name": "Doe",
+        "email": "doe@email.com",
+        "dial_code": "ID",
+        "phone_number": "8987654321",
+        "password": "1234"
     }
 ]

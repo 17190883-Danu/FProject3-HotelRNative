@@ -11,6 +11,7 @@ import {
 
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { authLogin } from '../../features/service/handleAuth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
     PrimaryButton,
@@ -40,7 +41,6 @@ const LoginScreen = ({navigation}) => {
     useEffect(() => {
         if (userState.isLoginSuccess) {
             navigation.navigate('Home')
-            console.log('here ')
         }
     }, [userState.isLoginSuccess])
 
