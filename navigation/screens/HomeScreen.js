@@ -7,24 +7,33 @@ import { Button as ButtonB } from '@rneui/themed';
 import { Card } from 'react-native-paper';
 
 const HomeScreen = ({navigation}) => {
-    // const getData = async () => {
-    //     try {
-    //         const res= await axios.get('https://hotels4.p.rapidapi.com/v2/get-meta-data', {
-    //             headers: {
-    //                 apiKey: 'b81885abf3mshe701430ff57723dp142880jsn3bf6349f6474',
-    //                 apiHost: 'hotels4.p.rapidapi.com',
-    //             },
-    //         });
+    
+    const [data, setData] = useState({
+        baseUrl: '',
+        imageId: '',
+        mainUrl: '',
+    })
+    useEffect(() => {
+    }, []);
+    // const [page, setPage] = useState();
 
-    //         console.log(res);
-    //     } catch (error) {
-    //         alert(error.message);
-    //     }
-    // };
+    const options = {
+        method: 'GET',
+        headers: {
+            'X-RapidAPI-Key': 'b81885abf3mshe701430ff57723dp142880jsn3bf6349f6474',
+            'X-RapidAPI-Host': 'hotels-com-provider.p.rapidapi.com'
+        }
+    };
+    
+    fetch('https://hotels-com-provider.p.rapidapi.com/v1/hotels/photos?hotel_id=363464', options)
+        .then(response => response.json())
+        // .then(response => console.log(response))
+        // .catch(err => console.error(err));
+        .then(response => {
+            console.log(response)
+            setData(response.data)
+        })
 
-    // useEffect(() => {
-    //     getData()
-    // }, [])
 
     const [search, setSearch] = useState('');
 
