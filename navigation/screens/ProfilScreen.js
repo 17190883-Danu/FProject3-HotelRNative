@@ -15,15 +15,17 @@ const ProfilScreen = ({navigation}) => {
     const getSession = () => {
         AsyncStorage.getItem('session')
         .then((res) => {
-            const users = require('../../features/user.json')
-            const userInfo = users.map((user) => {
-                if(user.id === JSON.parse(res).id) {
-                    return user
-                }
+            AsyncStorage.getItem('user')
+            .then((response) => {
+                const userInfo = JSON.parse(response).map((user) => {
+                    if(user.id === JSON.parse(res).id) {
+                        return user
+                    }
+                })
+                // console.log('userInfo ', userInfo)
+                setUserData(...userInfo)
+                return response
             })
-            console.log('userInfo ', userInfo)
-            setUserData(...userInfo)
-            return res
         })
     }
 
@@ -42,19 +44,17 @@ const ProfilScreen = ({navigation}) => {
         getSession()
     }, [authState])
 
-    useEffect(() => {
-        // console.log('userData ', userData)
-    }, [userData])
-
     const handleLogout = () => {
         dispatch(authLogout()).then(() => navigation.navigate('Home'))
     }
 
     const handleOnpress = (title, value, key) => {
+        // console.log('userData ', userData)
         navigation.navigate('modal', {
             title: title,
             value: value,
-            key: key
+            key: key,
+            userData: userData
         })
     }
 
@@ -71,16 +71,19 @@ const ProfilScreen = ({navigation}) => {
                 label='Last Name'
                 icon={require('../../assets/icons/profil.png')}
                 value={userData && userData.last_name}
+                onPress={() => handleOnpress('Last Name', userData && userData.last_name, 'last_name')}
             />
             <GhostButton
                 label='Email'
                 icon={require('../../assets/icons/alternate-email-rounded.png')}
                 value={userData && userData.email}
+                onPress={() => handleOnpress('Email', userData && userData.email, 'email')}
             />
             <GhostButton
                 label='Phone Number'
                 icon={require('../../assets/icons/Phone.png')}
                 value={userData && `${getDialCode(userData.dial_code)} ${userData.phone_number}`}
+                onPress={() => handleOnpress('Phone Number', userData && userData.phone_number, 'phone_number')}
             />
             {/* <GhostButton
                 label='Phone Number'

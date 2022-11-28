@@ -8,19 +8,28 @@ import {
     Animated, 
     StyleSheet
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+    useDispatch,
+    useSelector
+} from 'react-redux';
+
+import { changeAuthProfile } from '../../features/service/handleAuth'
 import {
     PrimaryButton,
     InputText
 } from '../../components/atom'
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ModalScreen = ({
     navigation,
     route
 }) => {
-    const { title, value, key } = route.params;
+    const { title, value, key, userData } = route.params;
     const [inputValue, setInputValue] = useState(value);
     const slideAnim = useRef(new Animated.Value(0)).current;
+    const authState = useSelector((state) => state.auth)
+    const dispatch = useDispatch()
+
     useEffect(() => {
         Animated.timing(
             slideAnim,
@@ -43,26 +52,10 @@ const ModalScreen = ({
         }
     }
 
-    const handleOnpress =  async (key) => {
-        try {
-            const userData = require('../../features/user.json')
-            await AsyncStorage.getItem('session')
-            .then((res) => {
-                const userId = JSON.parse(res).id
-                const user = userData.map((data) => {
-                    if(data.id === userId) {
-                        data[key] = inputValue
-                        return data
-                    }
-                })
-                return user
-            })
-            .then((res) => {
-                console.log('res ', res[0][key])
-            })
-        } catch(e) {
-            console.log('error ', e)
-        }
+    const handleOnpress =  async () => {
+        dispatch(changeAuthProfile({userData, inputValue, key})).then(() => {
+            navigation.goBack()
+        })
     }
 
     return (
@@ -79,7 +72,7 @@ const ModalScreen = ({
                 ]    
             }
         ]}>
-        <TouchableOpacity style={styles.closeArea} onPress={() => navigation.goBack()}></TouchableOpacity>
+            <TouchableOpacity style={styles.closeArea} onPress={() => navigation.goBack()}></TouchableOpacity>
             <View style={styles.modalBackground}>
                 <Text style={styles.title}>{title}</Text>
                 {/* <View style={styles.input}>

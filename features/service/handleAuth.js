@@ -7,7 +7,8 @@ const initialState = {
     isLoginSuccess: false,
     isLoggedIn: false,
     loginMessage: '',
-    users: {},
+    session: {},
+    user: {},
 }
 
 // bcrypt.setRandomFallback((len) => {
@@ -50,6 +51,28 @@ const getUserData = async () => {
     }
 }
 
+export const changeAuthProfile = createAsyncThunk('auth/changeAuthProfile', async ({userData, inputValue, key}) => {
+    try {
+        console.log('userData ', userData)
+        await AsyncStorage.getItem('user')
+        .then((res) => {
+            const userId = userData.id
+            const newData = {...userData, [key]: inputValue}
+            const newUserData = JSON.parse(res).map((user) => {
+                if(user.id === userId) {
+                    return newData
+                }
+                return user
+            })
+            console.log('res ', newUserData)
+            AsyncStorage.setItem('user', JSON.stringify(newUserData))
+            return newUserData
+        })
+    } catch(e) {
+        console.log('error ', e)
+    }
+})
+
 export const authLogin = createAsyncThunk('auth/login', async ({email, password}) => {
     try {
         await AsyncStorage.getItem('user').then((res) => {
@@ -65,7 +88,6 @@ export const authLogin = createAsyncThunk('auth/login', async ({email, password}
             // const checkPass = user ? bcrypt.compareSync(password, user.password) : false
             // console.log('checkPass ', checkPass) Note: taking too long to compare
             if(sessionInfo) {
-                console.log('ere')
                 storeSession(sessionInfo).then(() => {
                     console.warn('Login success')
                     return user
@@ -101,7 +123,7 @@ const handleAuth = createSlice({
             state.isLoginPending = false
             state.isLoginSuccess = true
             state.isLoggedIn = true
-            state.users = action.payload
+            state.session = action.payload
         })
         builder.addCase(authLogin.rejected, (state, action) => {
             state.isLoginPending = false
@@ -115,9 +137,24 @@ const handleAuth = createSlice({
             state.isLoginPending = false
             state.isLoginSuccess = true
             state.isLoggedIn = false
-            state.users = {}
+            state.session = {}
         })
         builder.addCase(authLogout.rejected, (state, action) => {
+            state.isLoginPending = false
+            state.isLoginSuccess = false
+            state.loginMessage = action.error.message
+        })
+        builder.addCase(changeAuthProfile.pending, (state, action) => {
+            state.isLoginPending = true
+        })
+        builder.addCase(changeAuthProfile.fulfilled, (state, action) => {
+            state.isLoginPending = false
+            state.isLoginSuccess = true
+            state.isLoggedIn = false
+            state.session = {}
+            state.user = action.payload
+        })
+        builder.addCase(changeAuthProfile.rejected, (state, action) => {
             state.isLoginPending = false
             state.isLoginSuccess = false
             state.loginMessage = action.error.message
