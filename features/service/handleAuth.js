@@ -41,9 +41,8 @@ const destroySession = async () => {
 
 const getUserData = async () => {
     try {
-        await AsyncStorage.getItem('user')
+        return await AsyncStorage.getItem('user')
         .then((res) => {
-            // console.log('res ', res)
             return res
         })
     } catch (e) {
@@ -101,6 +100,27 @@ export const authLogin = createAsyncThunk('auth/login', async ({email, password}
     }
 })
 
+export const getUserDataBySession = createAsyncThunk('auth/getUserDataBySession', async () => {
+    try {
+        await AsyncStorage.getItem('session').then((res) => {
+            const session = JSON.parse(res)
+            // console.log('session ', session)
+            if(session) {
+                return getUserData().then((response) => {
+                    // console.log('response ', response)
+                    user = JSON.parse(response).find(user => user.id === session.id)
+                    // console.log('user ', user)
+                    return user
+                })
+            } else {
+                throw new Error('Session not found')
+            }
+        })
+    } catch (err) {
+        console.warn(err)
+    }
+})
+
 export const authLogout = createAsyncThunk('auth/logout', async () => {
     try {
         destroySession().then(() => {
@@ -126,6 +146,20 @@ const handleAuth = createSlice({
             state.session = action.payload
         })
         builder.addCase(authLogin.rejected, (state, action) => {
+            state.isLoginPending = false
+            state.isLoginSuccess = false
+            state.loginMessage = action.error.message
+        })
+        builder.addCase(getUserDataBySession.pending, (state, action) => {
+            state.isLoginPending = true
+        })
+        builder.addCase(getUserDataBySession.fulfilled, (state, action) => {
+            state.isLoginPending = false
+            state.isLoginSuccess = true
+            state.isLoggedIn = true
+            state.user = action.payload
+        })
+        builder.addCase(getUserDataBySession.rejected, (state, action) => {
             state.isLoginPending = false
             state.isLoginSuccess = false
             state.loginMessage = action.error.message

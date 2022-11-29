@@ -20,7 +20,7 @@ const GhostButton = ({
         <TouchableOpacity onPress={onPress} style={styles.container}>
             {icon && <Image source={icon} style={styles.icon} />}
             <View>
-                <Text style={{...styles.text, color: type === 'danger' ? '#e32f45' : '#1c1c1c'}}>{label}</Text>
+                <Text style={{...styles.text, color: type === 'danger' ? '#e32f45' : '#474747'}}>{label}</Text>
                 {
                     value && <Text style={styles.value}>{value}</Text>
                 }
@@ -37,6 +37,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
         paddingVertical: 16,
+        paddingLeft: 12,
     },
     icon: {
         width: 16,
