@@ -4,7 +4,7 @@ import { View, Text, Button, StyleSheet } from "react-native";
 const SettingScreen = ({navigation}) => {
     return (
         <View style={styles.container}>
-            <Text>Setting Nih</Text>
+            <Text>Setting</Text>
         </View>
     );
 };

@@ -4,7 +4,7 @@ import { View, Text, Button, StyleSheet } from "react-native";
 const FavoriteScreen = ({navigation}) => {
     return (
         <View style={styles.container}>
-            <Text>Fav Nih</Text>
+            <Text>Favorit</Text>
         </View>
     );
 };

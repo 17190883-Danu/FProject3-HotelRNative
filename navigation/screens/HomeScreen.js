@@ -1,13 +1,20 @@
 // import React from "react";
 // import axios from 'axios';
 import React, {useState, useEffect} from 'react';
-import { SafeAreaView, ScrollView, View, Text, Button, StyleSheet, Image, TextInput, StatusBar } from "react-native";
+import { SafeAreaView, ScrollView, View, Text, Button, StyleSheet, Image, TextInput, Keyboard, StatusBar, ActivityIndicator } from "react-native";
 import { Button as ButtonB } from '@rneui/themed';
+import DatePicker from 'react-native-date-picker'
+
+import { SearchBar } from 'react-native-elements';
 
 import { Card } from 'react-native-paper';
+import { renderNode } from '@rneui/base';
 
 const HomeScreen = ({navigation}) => {
     
+    const [date, setDate] = useState(new Date())
+    const [open, setOpen] = useState(false)
+
     const [data, setData] = useState({
         baseUrl: '',
         imageId: '',
@@ -33,75 +40,57 @@ const HomeScreen = ({navigation}) => {
             console.log(response)
             setData(response.data)
         })
-
-
-    const [search, setSearch] = useState('');
+         
+    // const [search, setSearch] = useState('');
 
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.scrollView}>
                 
         {/* SEARCH */}
-            <Image 
-                source={require('hotelfp/assets/icons/home.png')}
-                style={{
-                    width: 25,
-                    height: 25,
-                    // alignItems: 'row',
-                }}
-            />
-            <TextInput
-                style={styles.textInputStyle}
-                onChangeText={(text) => searchFilterFunction(text)}
-                value={search}
-                // underlineColorAndroid="transparent"
-                placeholder="Search Here"
-            />
-
-            {/* DATE/KALENDER */}
-            <View style={{flex: 1, backgroundColor: 'blue', padding: 0}}>
-                <Image 
-                    source={require('hotelfp/assets/icons/kalender.png')}
-                    resizeMode='contain'
-                    style={{
-                        width: 25,
-                        height: 25,
-                        // tintColor: focused ? '#e32f45' : '#748c94',
-                    }}
+        {/* <View style={{ height: 75, width: 'auto', alignItems: 'center'}}> */}
+        <SearchBar
+                    placeholder="Type Here..."
+                    // onChangeText={this.updateSearch}
+                    // value={search}
                 />
-                <Text style={{
-                        fontSize: 15, 
-                        fontWeight: 'bold', 
-                        color: '20232a', 
-                        bordercolor: '20232a',
-                        // textAlign: 'center'
-                        // flexDirection: 'row'
-                    }}>Check-In Date</Text>
-            </View>
-
-            <View style={{flex: 1, backgroundColor: 'red', padding: 0}}>
-                <Image 
-                    source={require('hotelfp/assets/icons/kalender.png')}
-                    resizeMode='contain'
-                    style={{
-                        width: 25,
-                        height: 25,
-                        // tintColor: focused ? '#e32f45' : '#748c94',
-                    }}
-                />
-                <Text style={{
-                        fontSize: 15, 
-                        fontWeight: 'bold', 
-                        color: '20232a', 
-                        bordercolor: '20232a',
-                        // textAlign: 'center'
-                        // flexDirection: 'row'
-                    }}>Check-Out Date</Text>
-            </View>
+        {/* </View> */}
             
 
+            {/* DATE/Check-IN/OUT */}
+            <View style={{flexDirection: 'row', height: 50, width: 'auto'}}>
+            <Button title="Check-In Date" onPress={() => setOpen(true)} />
+                    <DatePicker
+                        modal
+                        open={open}
+                        date={date}
+                        onConfirm={(date) => {
+                        setOpen(false)
+                        setDate(date)
+                        }}
+                        onCancel={() => {
+                        setOpen(false)
+                        }}
+                    />
+
+                <Button title="Check-Out Date" onPress={() => setOpen(true)} />
+                    <DatePicker
+                        modal
+                        open={open}
+                        date={date}
+                        onConfirm={(date) => {
+                        setOpen(false)
+                        setDate(date)
+                        }}
+                        onCancel={() => {
+                        setOpen(false)
+                        }}
+                    />
+            </View>
+               
+            
             {/* TAMU */}
-            <View style={{flex: 1, backgroundColor: 'green', padding: 0}}>
+            <View style={{flexDirection: 'row', backgroundColor: 'green', padding: 0, width: 250}}>
             <Image 
                 source={require('hotelfp/assets/icons/profil.png')}
                 resizeMode='contain'
@@ -135,8 +124,10 @@ const HomeScreen = ({navigation}) => {
                 Search
             </ButtonB>
 
+            
+
             {/* CARD  TOP */}
-            <View style={{flexDirection: 'row'}}>
+            <View style={{flexDirection: 'row',}}>
                 <View style={styles.card_template}>
                     <Text style={{fontSize: 12}}>TOP DESTINATION</Text>
                     <Image 
@@ -148,34 +139,15 @@ const HomeScreen = ({navigation}) => {
                         <Text style={styles.card_title}>Some Textt</Text>
                     </View>
                 </View>
-            </View>
-           
-            <View style={{flexDirection: 'row'}}>
-                <View style={styles.card_template}>
                     <Image 
-                        
                         style={styles.card_image}
                         source={{uri: 'https://www.ruparupa.com/blog/wp-content/uploads/2021/09/Screen-Shot-2021-09-02-at-14.56.22.jpg'}}
                     />
                     <View style={styles.text_container}>
                         <Text style={styles.card_title}>Some Textt</Text>
                     </View>
-                </View>
             </View>
-
-            <View style={{flexDirection: 'row'}}>
-                <View style={styles.card_template}>
-                    <Image 
-                        
-                        style={styles.card_image}
-                        source={{uri: 'https://www.ruparupa.com/blog/wp-content/uploads/2021/09/Screen-Shot-2021-09-02-at-14.56.22.jpg'}}
-                    />
-                    <View style={styles.text_container}>
-                        <Text style={styles.card_title}>Some Textt</Text>
-                    </View>
-                </View>
-            </View>
-
+            
              {/* CARD POPULAR  */}
              <View style={{flexDirection: 'row'}}>
                 <View style={styles.card_template}>
@@ -189,32 +161,13 @@ const HomeScreen = ({navigation}) => {
                         <Text style={styles.card_title}>Some Textt</Text>
                     </View>
                 </View>
-            </View>
-           
-            <View style={{flexDirection: 'row'}}>
-                <View style={styles.card_template}>
-                    <Image 
-                        
+                <Image 
                         style={styles.card_image}
                         source={{uri: 'https://www.ruparupa.com/blog/wp-content/uploads/2021/09/Screen-Shot-2021-09-02-at-14.56.22.jpg'}}
                     />
                     <View style={styles.text_container}>
                         <Text style={styles.card_title}>Some Textt</Text>
                     </View>
-                </View>
-            </View>
-
-            <View style={{flexDirection: 'row'}}>
-                <View style={styles.card_template}>
-                    <Image 
-                        
-                        style={styles.card_image}
-                        source={{uri: 'https://www.ruparupa.com/blog/wp-content/uploads/2021/09/Screen-Shot-2021-09-02-at-14.56.22.jpg'}}
-                    />
-                    <View style={styles.text_container}>
-                        <Text style={styles.card_title}>Some Textt</Text>
-                    </View>
-                </View>
             </View>
 
             </ScrollView>
@@ -234,7 +187,9 @@ const styles = StyleSheet.create({
         alignItems: "center",
     scrollView: {
         backgroundColor: 'pink',
-        marginHorizontal: 20,
+        marginHorizontal: 30,
+        flexDirection: 'row',
+        justifyContent: 'center',
       },
     },
     textInputStyle: {
@@ -250,24 +205,24 @@ const styles = StyleSheet.create({
     //     flexDirection: 'row'
     //   },
       card_template:{
-        width: 250,
-        height: 250,
+        width: 100,
+        height: 130,
         boxShadow: "10px 10px 17px -12px rgba(0,0,0,0.75)",
         // flexDirection: 'row'
       },
       card_image: {
-        width: 250,
-        height: 250,
-        borderRadius : 10,
+        width: 100,
+        height: 100,
+        borderRadius : 20,
         // flexDirection: 'row'
       },
       text_container:{
         position: "absolute",
-        width: 250,
+        width: 100,
         height: 30,
         bottom:0,
         padding: 5,
-        backgroundColor: "rgba(0,0,0, 0.3)",
+        backgroundColor: "rgba(0, 0.3)",
         borderBottomLeftRadius : 10,
         borderBottomRightRadius: 10,
         flexDirection: 'row'
