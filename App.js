@@ -4,8 +4,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Tabs from './navigation/tabs';
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  Text
+} from 'react-native'
 
 import ModalScreen from "./navigation/screens/ModalScreen";
+import BookingScreen from "./navigation/screens/BookingScreen";
+import BookingHistoryScreen from "./navigation/screens/BookingHistoryScreen";
 
 const stack = createNativeStackNavigator();
 
@@ -36,7 +41,7 @@ const App = () => {
   return(
     <SafeAreaProvider>
       <NavigationContainer>
-        <stack.Navigator initialRouteName="main" screenOptions={{ headerShown: false, }}>
+        <stack.Navigator initialRouteName="main">
           <stack.Screen name="main" component={Tabs} options={{headerShown: false}} />
           <stack.Screen name="modal" component={ModalScreen} options={{
             presentation: 'transparentModal',
@@ -45,6 +50,8 @@ const App = () => {
               backgroundColor: 'rgba(0,0,0,0.5)',
             }
             }} />
+          <stack.Screen name="booking" component={BookingScreen} options={{ headerShown: false, }} />
+          <stack.Screen name="Booking History" component={BookingHistoryScreen}/>
         </stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

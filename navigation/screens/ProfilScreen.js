@@ -61,6 +61,13 @@ const ProfilScreen = ({navigation}) => {
     return (
         <View style={styles.container}>
             {/* <Text>Profil Nih</Text> */}
+            <Text style={styles.sectionTitle}>Profile</Text>
+            <GhostButton
+                label="Booking History"
+                icon={require('../../assets/icons/history.png')}
+                onPress={() => navigation.navigate('Booking History')}
+            />
+            <Text style={styles.sectionTitle}>Settings</Text>
             <GhostButton
                 label='First Name'
                 icon={require('../../assets/icons/profil.png')}
@@ -90,6 +97,7 @@ const ProfilScreen = ({navigation}) => {
                 icon={require('../../assets/icons/phone.png')}
                 value={sessionData && JSON.parse(sessionData).last_name}
             /> */}
+            <Text style={styles.sectionTitle}>Danger Area</Text>
             <GhostButton
                 label='Log Out'
                 type='danger'
@@ -107,7 +115,12 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
         justifyContent: 'flex-start',
         backgroundColor: "#fff",
-        paddingVertical: 24,
-        paddingHorizontal: 16,
+        padding: 16,
     },
+    sectionTitle: {
+        fontSize: 16,
+        fontFamily: 'Poppins-SemiBold',
+        marginTop: 28,
+        color: '#1c1c1c',
+    }
 });
