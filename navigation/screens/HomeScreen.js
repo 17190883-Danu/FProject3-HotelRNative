@@ -4,6 +4,7 @@ import React, {useState, useEffect} from 'react';
 import { SafeAreaView, ScrollView, View, Text, Button, StyleSheet, Image, TextInput, Keyboard, StatusBar, ActivityIndicator } from "react-native";
 import { Button as ButtonB } from '@rneui/themed';
 import DatePicker from 'react-native-date-picker'
+import SelectDropdown from 'react-native-select-dropdown'
 
 import { SearchBar } from 'react-native-elements';
 
@@ -12,33 +13,35 @@ import { renderNode } from '@rneui/base';
 
 const HomeScreen = ({navigation}) => {
     
+    // checkin-out
     const [date, setDate] = useState(new Date())
     const [open, setOpen] = useState(false)
+    // guest
+    const countries = ["1", "2", "3", "4"]
 
-    const [data, setData] = useState({
-        baseUrl: '',
-        imageId: '',
-        mainUrl: '',
+    const [dataHotel, setDataHotel] = useState({
+        // image: '',
+        name: '',
     })
     useEffect(() => {
     }, []);
-    // const [page, setPage] = useState();
+    // // const [page, setPage] = useState();
 
     const options = {
         method: 'GET',
         headers: {
-            'X-RapidAPI-Key': 'b81885abf3mshe701430ff57723dp142880jsn3bf6349f6474',
+            'X-RapidAPI-Key': 'c812b8a6b2msh6ef1f4b4a978783p1bebb8jsna3309b60d4e8',
             'X-RapidAPI-Host': 'hotels-com-provider.p.rapidapi.com'
         }
     };
     
-    fetch('https://hotels-com-provider.p.rapidapi.com/v1/hotels/photos?hotel_id=363464', options)
+    fetch('https://hotels-com-provider.p.rapidapi.com/v1/destinations/search?locale=en_US&currency=USD&query=Jakarta', options)
         .then(response => response.json())
         // .then(response => console.log(response))
         // .catch(err => console.error(err));
-        .then(response => {
-            console.log(response)
-            setData(response.data)
+        .then(json => {
+            console.log(json)
+            setDataHotel(json.dataHotel)
         })
          
     // const [search, setSearch] = useState('');
@@ -59,7 +62,7 @@ const HomeScreen = ({navigation}) => {
 
             {/* DATE/Check-IN/OUT */}
             <View style={{flexDirection: 'row', height: 50, width: 'auto'}}>
-            <Button title="Check-In Date" onPress={() => setOpen(true)} />
+                <Button title="Check-In Date" onPress={() => setOpen(true)} />
                     <DatePicker
                         modal
                         open={open}
@@ -90,25 +93,22 @@ const HomeScreen = ({navigation}) => {
                
             
             {/* TAMU */}
-            <View style={{flexDirection: 'row', backgroundColor: 'green', padding: 0, width: 250}}>
-            <Image 
-                source={require('hotelfp/assets/icons/profil.png')}
-                resizeMode='contain'
-                style={{
-                    width: 25,
-                    height: 25,
-                    // tintColor: focused ? '#e32f45' : '#748c94',
+            <SelectDropdown
+                data={countries}
+                onSelect={(selectedItem, index) => {
+                    console.log(selectedItem, index)
+                }}
+                buttonTextAfterSelection={(selectedItem, index) => {
+                    // text represented after item is selected
+                    // if data array is an array of objects then return selectedItem.property to render after item is selected
+                    return selectedItem
+                }}
+                rowTextForSelection={(item, index) => {
+                    // text represented for each item in dropdown
+                    // if data array is an array of objects then return item.property to represent item in dropdown
+                    return item
                 }}
             />
-            <Text style={{
-                        fontSize: 15, 
-                        fontWeight: 'bold', 
-                        color: '20232a', 
-                        bordercolor: '20232a',
-                        // textAlign: 'center'
-                        // flexDirection: 'row'
-                    }}>Guest</Text>
-            </View>
             
 
             {/* BUTTON SEARCH */}
@@ -136,7 +136,7 @@ const HomeScreen = ({navigation}) => {
                         source={{uri: 'https://www.ruparupa.com/blog/wp-content/uploads/2021/09/Screen-Shot-2021-09-02-at-14.56.22.jpg'}}
                     />
                     <View style={styles.text_container}>
-                        <Text style={styles.card_title}>Some Textt</Text>
+                        <Text style={styles.card_title}>{dataHotel.name}</Text>
                     </View>
                 </View>
                     <Image 

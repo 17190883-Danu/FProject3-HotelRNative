@@ -12,8 +12,8 @@ import store from './store'
 
 const Root = () => (
     <Provider store={store}>
-        <BookingScreen />
-        {/* <App /> */}
+        {/* <BookingScreen /> */}
+        <App />
     </Provider>
 )
 
