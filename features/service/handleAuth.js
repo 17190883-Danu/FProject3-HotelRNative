@@ -102,20 +102,17 @@ export const authLogin = createAsyncThunk('auth/login', async ({email, password}
 
 export const getUserDataBySession = createAsyncThunk('auth/getUserDataBySession', async () => {
     try {
-        await AsyncStorage.getItem('session').then((res) => {
-            const session = JSON.parse(res)
-            // console.log('session ', session)
-            if(session) {
-                return getUserData().then((response) => {
-                    // console.log('response ', response)
-                    user = JSON.parse(response).find(user => user.id === session.id)
-                    // console.log('user ', user)
-                    return user
-                })
+        const res = await AsyncStorage.getItem('session');
+        const session = JSON.parse(res)
+        // console.log('session ', session)
+            if(session) { 
+                const responseUser = await AsyncStorage.getItem('user');
+                const user = JSON.parse(responseUser).find(user => user.id === session.id);
+                // console.log('user ', user)
+            return user;
             } else {
                 throw new Error('Session not found')
             }
-        })
     } catch (err) {
         console.warn(err)
     }
@@ -157,6 +154,7 @@ const handleAuth = createSlice({
             state.isLoginPending = false
             state.isLoginSuccess = true
             state.isLoggedIn = true
+            // console.log('payload ', action.payload)
             state.user = action.payload
         })
         builder.addCase(getUserDataBySession.rejected, (state, action) => {

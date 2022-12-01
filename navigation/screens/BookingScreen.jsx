@@ -2,22 +2,27 @@ import React, {useState, useEffect} from 'react'
 import {
     View, 
     Text,
-    FlatList,
+    ScrollView,
     StyleSheet 
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 
+import {
+    addToBookHistory
+} from '../../features/service/handleBooking'
 import { getUserDataBySession } from '../../features/service/handleAuth'
 import {
     InputText, 
     PrimaryButton
 } from '../../components/atom'
 
-const BookingScreen = ({navigation}) => {
+const BookingScreen = ({navigation, route}) => {
+    const { price, currency, checkIn, checkOut, days, guest, hotelId, roomId } = route.params
     const authState = useSelector((state) => state.auth)
     const dispatch = useDispatch();
-    const [userData, setUserData] = useState(null);
-    const [nightMode, setNightmode] = useState(false);
+    const [userData, setUserData] = useState([]);
+    const [fullName, setFullName] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [showDropdown, setShowDropdown] = useState(false);
     const [dialCodeList, setDialCodeList] = useState([]);
     const [dialCode, setDialCode] = useState('');
@@ -27,7 +32,9 @@ const BookingScreen = ({navigation}) => {
     }, [])
 
     useEffect(() => {
-        console.log('state ', authState.user)
+        setUserData(authState.user)
+        setFullName(`${authState.user.first_name} ${authState.user.last_name}`)
+        setPhoneNumber(authState.user.phone_number)
     }, [authState])
 
     // useEffect(() => {
@@ -41,41 +48,86 @@ const BookingScreen = ({navigation}) => {
     //     setDialCodeList(phoneNumberCode)
     // }, [])
 
+    const handleOnpress = () => {
+        // console.log('userData ', userData)
+       const bookingData = {
+            user_id: userData.id,
+            full_name: fullName,
+            email: userData.email,
+            phone_number: phoneNumber,
+            hotel_id: hotelId,
+            room_id: roomId,
+            check_in: checkIn,
+            check_out: checkOut,
+            total_price: price,
+            total_days: days,
+            total_guest: guest
+        }
+        console.log('bookingData ', bookingData)
+        dispatch(addToBookHistory(bookingData))
+        navigation.navigate('Booking History')
+    }
+
     return (
-        <FlatList
-            data={userData}
-            keyExtractor={(item) => item.id}
-            renderItem={({item}) => {
-                return (
-                    <View style={styles.container}>
-                        <Text style={styles.sectionTitle}>Contact Informations</Text>
-                        <InputText
-                            label={'Full Name'}
-                            value={`${item.first_name} ${item.last_name}`}
-                            placeholder="Full Name" />
-                        <InputText
-                            label={'Email'}
-                            value={item.email}
-                            placeholder="Email" />
-                        <InputText
-                            label='Phone Number'
-                            value={item.phone_number}
-                            placeholder="Phone Number" />
-                        <View style={styles.phoneNumber}>
+        <View style={{
+            flex: 1,
+            backgroundColor: 'fff'
+        }}>
+            <ScrollView contentContainerStyle={{
+                    flex: 1,
+                    backgroundColor: '#fff'
+                }}>
+                <View style={styles.container}>
+                    <Text style={styles.sectionTitle}>Contact Informations</Text>
+                    <InputText
+                        label={'Full Name'}
+                        value={fullName}
+                        onChangeText={(value) => setFullName(value)}
+                        placeholder="Full Name" />
+                    <InputText
+                        label={'Email'}
+                        value={userData.email}
+                        placeholder="Email"
+                        editable={false}
+                        />
+                    <InputText
+                        label='Phone Number'
+                        value={phoneNumber}
+                        onChangeText={(value) => setPhoneNumber(value)}
+                        placeholder="Phone Number"
+                        />
+
+                    {/* <View style={styles.priceInfo}>
+                        <Text style={styles.sectionTitle}>Price Information</Text>
+                        <View>
+                            <Text>3 Days, 1 Room, 2 Guests</Text>
+                            <Text></Text>
                         </View>
-                        <PrimaryButton text="Primary Button" />
-                    </View>
-                )
-            }}
-                
-        />
+                    </View> */}
+                </View>
+            </ScrollView>
+            {/* <View style={styles.phoneNumber}>
+            </View> */}
+
+            <View style={styles.summaryPrice}>
+                <Text style={[styles.sectionTitle, {alignSelf: 'flex-start', marginTop: 0}]}>Price Summary</Text>
+                <View style={styles.priceInfo}>
+                    <Text>{days} days, {guest} Guest</Text>
+                    <Text style={styles.totalPrice}>{price}</Text>
+                </View>
+            <PrimaryButton
+                text="Primary Button"
+                onPress={handleOnpress}
+            />
+            </View>
+        </View>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
         padding: 32,
-        flex: 1,
+        paddingTop: 12,
         justifyContent: 'flex-start',
         alignItems: 'center',
         backgroundColor: 'white'
@@ -88,6 +140,30 @@ const styles = StyleSheet.create({
     },
     phoneNumber :{
         flexDirection: 'row',
+    },
+    summaryPrice: {
+        backgroundColor: '#fff',
+        width: '100%',
+        padding: 16,
+
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+
+        elevation: 5,
+    },
+    priceInfo: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 16,
+    },
+    totalPrice: {
+        fontWeight: 'bold',
+        fontSize: 16
     }
 })
 

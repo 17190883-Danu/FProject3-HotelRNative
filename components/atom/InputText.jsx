@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontFamily: 'Poppins-Medium',
         // marginBottom: -4,
-        marginLeft: 24,
+        // marginLeft: 24,
         marginTop: 8,
     },
     input: {

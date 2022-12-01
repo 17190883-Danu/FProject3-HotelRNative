@@ -5,10 +5,12 @@ import Tabs from './navigation/tabs';
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
-  Text
+  Text,
+  TouchableOpacity
 } from 'react-native'
 
 import ModalScreen from "./navigation/screens/ModalScreen";
+import HotelDetailScreen from "./navigation/screens/HotelDetailScreen";
 import BookingScreen from "./navigation/screens/BookingScreen";
 import BookingHistoryScreen from "./navigation/screens/BookingHistoryScreen";
 
@@ -50,8 +52,26 @@ const App = () => {
               backgroundColor: 'rgba(0,0,0,0.5)',
             }
             }} />
-          <stack.Screen name="booking" component={BookingScreen} options={{ headerShown: false, }} />
-          <stack.Screen name="Booking History" component={BookingHistoryScreen}/>
+          <stack.Screen name="Book Room" component={BookingScreen} />
+          <stack.Screen name="Hotel Detail" component={HotelDetailScreen}
+            initialParams={{
+              hotelId: '480872',
+              guestNumber: '4',
+              checkinDate: '2023-12-12',
+              checkoutDate: '2023-12-15',
+            }}
+          />
+          <stack.Screen name="Booking History" component={BookingHistoryScreen}
+            options={{
+              headerRight: () => {
+                return(
+                  <TouchableOpacity onPress={() => AsyncStorage.removeItem('bookingHistory')}>
+                    <Text style={{color: 'red'}}>Clear History</Text>
+                  </TouchableOpacity>
+                )
+              }
+            }}
+          />
         </stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

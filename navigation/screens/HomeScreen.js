@@ -1,7 +1,7 @@
 // import React from "react";
 // import axios from 'axios';
 import React, {useState, useEffect} from 'react';
-import { SafeAreaView, ScrollView, View, Text, Button, StyleSheet, Image, TextInput, Keyboard, StatusBar, ActivityIndicator } from "react-native";
+import { SafeAreaView, ScrollView, View, Text, Button, StyleSheet, Image, TextInput, Keyboard, StatusBar, ActivityIndicator, TouchableOpacity } from "react-native";
 import { Button as ButtonB } from '@rneui/themed';
 import DatePicker from 'react-native-date-picker'
 import SelectDropdown from 'react-native-select-dropdown'
@@ -19,30 +19,35 @@ const HomeScreen = ({navigation}) => {
     // guest
     const countries = ["1", "2", "3", "4"]
 
-    const [dataHotel, setDataHotel] = useState({
-        // image: '',
-        name: '',
-    })
-    useEffect(() => {
-    }, []);
-    // // const [page, setPage] = useState();
+    const [dataHotel, setDataHotel] = useState([])
 
     const options = {
         method: 'GET',
         headers: {
-            'X-RapidAPI-Key': 'c812b8a6b2msh6ef1f4b4a978783p1bebb8jsna3309b60d4e8',
+            'X-RapidAPI-Key': '8fd1a5b2femsh8b30ece821c1981p13a5c2jsn509938dc40cc',
             'X-RapidAPI-Host': 'hotels-com-provider.p.rapidapi.com'
         }
     };
-    
-    fetch('https://hotels-com-provider.p.rapidapi.com/v1/destinations/search?locale=en_US&currency=USD&query=Jakarta', options)
+
+    useEffect(() => {
+        fetch('https://hotels-com-provider.p.rapidapi.com/v1/destinations/search?locale=en_US&currency=USD&query=Jakarta', options)
         .then(response => response.json())
         // .then(response => console.log(response))
         // .catch(err => console.error(err));
         .then(json => {
-            console.log(json)
-            setDataHotel(json.dataHotel)
+            console.log('ere ',json)
+            setDataHotel(json.suggestions[1])
         })
+    }, []);
+    // // const [page, setPage] = useState();
+
+    
+    
+    
+
+        useEffect(() => {
+            console.log('data Hotel ', dataHotel)
+        }, [dataHotel])
          
     // const [search, setSearch] = useState('');
 
@@ -127,26 +132,33 @@ const HomeScreen = ({navigation}) => {
             
 
             {/* CARD  TOP */}
-            <View style={{flexDirection: 'row',}}>
-                <View style={styles.card_template}>
-                    <Text style={{fontSize: 12}}>TOP DESTINATION</Text>
-                    <Image 
-                        
-                        style={styles.card_image}
-                        source={{uri: 'https://www.ruparupa.com/blog/wp-content/uploads/2021/09/Screen-Shot-2021-09-02-at-14.56.22.jpg'}}
-                    />
-                    <View style={styles.text_container}>
-                        <Text style={styles.card_title}>{dataHotel.name}</Text>
+                <View style={{flexDirection: 'row',}}>
+                    <View style={styles.card_template}>
+                        <Text style={{fontSize: 12}}>TOP DESTINATION</Text>
+                        <TouchableOpacity onPress={() => navigation.navigate('Hotel Detail', {
+                            hotelId: '17903319',
+                            guestNumber: '4',
+                            checkinDate: '2023-12-12',
+                            checkoutDate: '2023-12-15',
+                            currency: 'USD',
+                        })}>
+                            <Image
+                                style={styles.card_image}
+                                source={{uri: 'https://www.ruparupa.com/blog/wp-content/uploads/2021/09/Screen-Shot-2021-09-02-at-14.56.22.jpg'}}
+                            />
+                            <View style={styles.text_container}>
+                                <Text style={styles.card_title}>{dataHotel.name}</Text>
+                            </View>
+                        </TouchableOpacity>
                     </View>
+                        <Image
+                            style={styles.card_image}
+                            source={{uri: 'https://www.ruparupa.com/blog/wp-content/uploads/2021/09/Screen-Shot-2021-09-02-at-14.56.22.jpg'}}
+                        />
+                        <View style={styles.text_container}>
+                            <Text style={styles.card_title}>Some Textt</Text>
+                        </View>
                 </View>
-                    <Image 
-                        style={styles.card_image}
-                        source={{uri: 'https://www.ruparupa.com/blog/wp-content/uploads/2021/09/Screen-Shot-2021-09-02-at-14.56.22.jpg'}}
-                    />
-                    <View style={styles.text_container}>
-                        <Text style={styles.card_title}>Some Textt</Text>
-                    </View>
-            </View>
             
              {/* CARD POPULAR  */}
              <View style={{flexDirection: 'row'}}>

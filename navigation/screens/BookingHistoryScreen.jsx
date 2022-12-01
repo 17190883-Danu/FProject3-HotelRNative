@@ -5,39 +5,57 @@ import {
     View, 
     Text, 
     Image,
+    FlatList,
     StyleSheet 
 } from 'react-native'
 import axios from 'axios'
 
+import { getBookHistory } from '../../features/service/handleBooking'
 import {
     InputText,
     PrimaryButton
 } from '../../components/atom'
 
 const BookingHistoryScreen = ({navigation}) => {
+    const [bookHistory, setBookHistory] = useState([])
     const bookingState = useSelector((state) => state.booking)
     const dispatch = useDispatch()
 
     useEffect(() => {
+        dispatch(getBookHistory())
+        console.log('s')
+    }, [])
 
-    })
+    useEffect(() => {
+        setBookHistory(bookingState.bookingHistory)
+        console.log('bookingState ', bookHistory)
+    }, [bookingState])
 
     return (
         <View style={styles.container}>
-            <View style={styles.bookingCard}>
-                <Image 
-                    style={styles.cardImage}
-                    source={{uri: 'https://www.ruparupa.com/blog/wp-content/uploads/2021/09/Screen-Shot-2021-09-02-at-14.56.22.jpg'}}
-                />
-                <View style={styles.hotelInfo}>
-                    <Text style={styles.hotelName}>Garden Hotel</Text>
-                    <Text style={styles.hotelAddress}>Addressssssssssssssss sssss s s ssss sssss</Text>
-                    <Text
-                        onPress={() => console.warn('pressed')}
-                        style={styles.bookButton}
-                    >Book Again</Text>
-                </View>
-            </View>
+            <FlatList
+                data={bookHistory}
+                keyExtractor={(item) => item++}
+                renderItem={({ item }) => {
+                    return (
+                        <View style={styles.bookingCard}>
+                        <Text style={{color:'black'}}>aaaa</Text>
+                            <Image 
+                                style={styles.cardImage}
+                                source={{uri: item.hotel_image}}
+                            />
+                            <View style={styles.hotelInfo}>
+                                <Text style={styles.hotelName}>{item.hotel_name}</Text>
+                                <Text style={styles.hotelAddress}>{item.address}</Text>
+                                <Text
+                                    // onPress={() => navigation.navigate('Hotel Detail', {hotelId: item.hotel_id})}
+                                    style={styles.bookButton}
+                                >Book Again</Text>
+                            </View>
+                        </View>
+                    )
+                }}
+            />
         </View>
     )
 }
