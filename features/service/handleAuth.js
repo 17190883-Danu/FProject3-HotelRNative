@@ -52,7 +52,7 @@ const getUserData = async () => {
 
 export const changeAuthProfile = createAsyncThunk('auth/changeAuthProfile', async ({userData, inputValue, key}) => {
     try {
-        console.log('userData ', userData)
+        // console.log('userData ', userData)
         await AsyncStorage.getItem('user')
         .then((res) => {
             const userId = userData.id
@@ -69,6 +69,18 @@ export const changeAuthProfile = createAsyncThunk('auth/changeAuthProfile', asyn
         })
     } catch(e) {
         console.log('error ', e)
+    }
+})
+
+export const checkSession = createAsyncThunk('auth/checkSession', async () => {
+    try {
+        const value = await AsyncStorage.getItem('session')
+        if(value !== null) {
+            const data = JSON.parse(value)
+            return data
+        }
+    } catch(e) {
+        console.log(e)
     }
 })
 
@@ -133,6 +145,20 @@ const handleAuth = createSlice({
     initialState,
     reducers: {},
     extraReducers(builder) {
+        builder.addCase(checkSession.pending, (state) => {
+            state.isLoginPending = true
+        })
+        builder.addCase(checkSession.fulfilled, (state, action) => {
+            state.isLoginPending = false
+            state.isLoginSuccess = true
+            state.isLoggedIn = true
+            state.session = action.payload
+        })
+        builder.addCase(checkSession.rejected, (state) => {
+            state.isLoginPending = false
+            state.isLoginSuccess = false
+            state.isLoggedIn = false
+        })
         builder.addCase(authLogin.pending, (state, action) => {
             state.isLoginPending = true
         })

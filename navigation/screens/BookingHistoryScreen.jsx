@@ -11,51 +11,78 @@ import {
 import axios from 'axios'
 
 import { getBookHistory } from '../../features/service/handleBooking'
+import { getUserDataBySession } from '../../features/service/handleAuth'
 import {
     InputText,
     PrimaryButton
 } from '../../components/atom'
 
 const BookingHistoryScreen = ({navigation}) => {
-    const [bookHistory, setBookHistory] = useState([])
     const bookingState = useSelector((state) => state.booking)
+    const [bookHistory, setBookHistory] = useState([])
+    const [userData, setUserData] = useState([]);
+    const userState = useSelector((state) => state.auth)
     const dispatch = useDispatch()
 
     useEffect(() => {
-        dispatch(getBookHistory())
-        console.log('s')
+        dispatch(getUserDataBySession())
+        .then(() => {
+            setUserData(userState.user)
+        })
+        .then(() => {
+            dispatch(getBookHistory(userData.id))
+        })
+        .then(() => {
+            setBookHistory(bookingState.bookHistory)
+        })
     }, [])
+
+    // useEffect(() => {
+    //     dispatch(getBookHistory(userData.id))
+    //     setBookHistory(bookingState.bookingHistory) 
+    // }, [])
 
     useEffect(() => {
         setBookHistory(bookingState.bookingHistory)
-        console.log('bookingState ', bookHistory)
-    }, [bookingState])
+        // console.log('bookingStates ', bookHistory)
+    }, [bookingState.bookingHistory])
 
     return (
         <View style={styles.container}>
             <FlatList
+                style={{width: '100%'}}
                 data={bookHistory}
-                keyExtractor={(item) => item++}
                 renderItem={({ item }) => {
                     return (
                         <View style={styles.bookingCard}>
-                        <Text style={{color:'black'}}>aaaa</Text>
-                            <Image 
-                                style={styles.cardImage}
-                                source={{uri: item.hotel_image}}
-                            />
-                            <View style={styles.hotelInfo}>
-                                <Text style={styles.hotelName}>{item.hotel_name}</Text>
-                                <Text style={styles.hotelAddress}>{item.address}</Text>
-                                <Text
-                                    // onPress={() => navigation.navigate('Hotel Detail', {hotelId: item.hotel_id})}
-                                    style={styles.bookButton}
-                                >Book Again</Text>
+                            <View style={styles.bookInfo}>
+                                <View style={styles.hotelInfo}>
+                                    <Text style={styles.hotelName}>{item.hotel_name}</Text>
+                                    <Text style={styles.hotelSubinfo}>{item.room_name}</Text>
+                                    <Text style={styles.hotelSubinfo}>{item.hotel_address}</Text>
+                                </View>
+                                <View style={styles.checkInInfo}>
+                                    <Text style={styles.hotelSubinfo}>Check In</Text>
+                                    <Text style={styles.hotelSubinfo}>{item.check_in}</Text>
+                                </View>
                             </View>
+                            {/* <PrimaryButton
+                                text='Book Again'
+                            /> */}
                         </View>
                     )
                 }}
+                ListEmptyComponent={() => (
+                    <View style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}>
+                        <Text>Tidak ada riwayat booking</Text>
+                    </View>
+                )}
             />
+            
         </View>
     )
 }
@@ -71,10 +98,8 @@ const styles = StyleSheet.create({
     },
     bookingCard: {
         width: '100%',
-        flexDirection: 'row',
-        alignItems: 'center',
-
-        
+        padding: 12,
+        marginBottom: 16,
         borderRadius: 8,
         shadowColor: "#000",
         shadowOffset: {
@@ -86,32 +111,32 @@ const styles = StyleSheet.create({
 
         elevation: 2,
     },
-    cardImage: {
-        flex: 1.3,
-        // width: 96,
-        height: '100%',
-        aspectRatio: 1,
-        borderRadius: 8,
+    bookInfo: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16,
     },
     hotelInfo: {
         flex: 2,
-        paddingVertical: 8,
-        paddingHorizontal: 12,
+    },
+    checkInInfo: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        alignItems: 'flex-end'
     },
     hotelName: {
-        fontSize: 16,
+        color: '#303030',
+        fontSize: 14,
         fontFamily: 'Poppins-Medium',
-        marginBottom: -4,
+        marginBottom: 6,
     },
-    bookButton: {
-        marginTop: 24,
-        alignSelf: 'flex-end',
-        color: '#512fb5',
+    hotelSubinfo: {
+        color: '#303030',
+        fontSize: 12,
+        fontFamily: 'Poppins-Regular',
+        marginBottom: 4,
     },
-    text: {
-        fontSize: 20,
-        fontFamily: 'Poppins-SemiBold',
-    }
 })
 
 export default BookingHistoryScreen

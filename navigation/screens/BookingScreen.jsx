@@ -3,12 +3,14 @@ import {
     View, 
     Text,
     ScrollView,
+    SafeAreaView,
     StyleSheet 
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
-    addToBookHistory
+    addToBookHistory,
+    getCurrency
 } from '../../features/service/handleBooking'
 import { getUserDataBySession } from '../../features/service/handleAuth'
 import {
@@ -17,19 +19,41 @@ import {
 } from '../../components/atom'
 
 const BookingScreen = ({navigation, route}) => {
-    const { price, currency, checkIn, checkOut, days, guest, hotelId, roomId } = route.params
+    const { 
+        price, 
+        domain,
+        checkIn, 
+        checkOut, 
+        days, 
+        guest, 
+        hotelId, 
+        hotelName,
+        hotelAddress,
+        roomId, 
+        roomName 
+    } = route.params
     const authState = useSelector((state) => state.auth)
+    const bookingState = useSelector((state) => state.booking)
     const dispatch = useDispatch();
     const [userData, setUserData] = useState([]);
     const [fullName, setFullName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [currency, setCurreny] = useState('Default_Currency');
     const [showDropdown, setShowDropdown] = useState(false);
     const [dialCodeList, setDialCodeList] = useState([]);
     const [dialCode, setDialCode] = useState('');
 
-    useEffect(() => {
+    useEffect(() => { 
         dispatch(getUserDataBySession())
     }, [])
+
+    useEffect(() => {
+        dispatch(getCurrency(domain))
+    }, [])
+
+    useEffect(() => {
+        setCurreny(bookingState.currency)
+    }, [bookingState.currency])
 
     useEffect(() => {
         setUserData(authState.user)
@@ -56,10 +80,14 @@ const BookingScreen = ({navigation, route}) => {
             email: userData.email,
             phone_number: phoneNumber,
             hotel_id: hotelId,
+            hotel_name: hotelName,
+            hotel_address: hotelAddress,
             room_id: roomId,
+            room_name: roomName,
             check_in: checkIn,
             check_out: checkOut,
             total_price: price,
+            currency: currency,
             total_days: days,
             total_guest: guest
         }
@@ -111,12 +139,13 @@ const BookingScreen = ({navigation, route}) => {
 
             <View style={styles.summaryPrice}>
                 <Text style={[styles.sectionTitle, {alignSelf: 'flex-start', marginTop: 0}]}>Price Summary</Text>
+                <Text style={{fontFamily: 'Poppins-Medium', marginBottom: 4}}>{roomName}</Text>
                 <View style={styles.priceInfo}>
                     <Text>{days} days, {guest} Guest</Text>
-                    <Text style={styles.totalPrice}>{price}</Text>
+                    <Text style={styles.totalPrice}>{`${currency} ${price}`}</Text>
                 </View>
             <PrimaryButton
-                text="Primary Button"
+                text="Book Now"
                 onPress={handleOnpress}
             />
             </View>

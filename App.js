@@ -1,6 +1,7 @@
 import React, {useEffect} from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { HeaderBackButtonProps } from "@react-navigation/native-stack/lib/typescript/src/types";
+import { createNativeStackNavigator, HeaderBackButton } from '@react-navigation/native-stack'
 import Tabs from './navigation/tabs';
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -63,13 +64,14 @@ const App = () => {
           />
           <stack.Screen name="Booking History" component={BookingHistoryScreen}
             options={{
-              headerRight: () => {
-                return(
-                  <TouchableOpacity onPress={() => AsyncStorage.removeItem('bookingHistory')}>
-                    <Text style={{color: 'red'}}>Clear History</Text>
-                  </TouchableOpacity>
-                )
-              }
+              // headerLeft: <HeaderBackButton onPress={() => Navigation.navigate('Profil')} />
+              // headerRight: () => {
+              //   return(
+              //     <TouchableOpacity onPress={() => AsyncStorage.removeItem('bookingHistory')}>
+              //       <Text style={{color: 'red'}}>Clear History</Text>
+              //     </TouchableOpacity>
+              //   )
+              // }
             }}
           />
         </stack.Navigator>

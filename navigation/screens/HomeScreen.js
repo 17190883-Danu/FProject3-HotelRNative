@@ -35,8 +35,8 @@ const HomeScreen = ({navigation}) => {
         // .then(response => console.log(response))
         // .catch(err => console.error(err));
         .then(json => {
-            console.log('ere ',json)
-            setDataHotel(json.suggestions[1])
+            // console.log('ere ',json)
+            // setDataHotel(json.suggestions[1])
         })
     }, []);
     // // const [page, setPage] = useState();
@@ -46,7 +46,7 @@ const HomeScreen = ({navigation}) => {
     
 
         useEffect(() => {
-            console.log('data Hotel ', dataHotel)
+            // console.log('data Hotel ', dataHotel)
         }, [dataHotel])
          
     // const [search, setSearch] = useState('');
@@ -101,7 +101,7 @@ const HomeScreen = ({navigation}) => {
             <SelectDropdown
                 data={countries}
                 onSelect={(selectedItem, index) => {
-                    console.log(selectedItem, index)
+                    // console.log(selectedItem, index)
                 }}
                 buttonTextAfterSelection={(selectedItem, index) => {
                     // text represented after item is selected
@@ -140,7 +140,7 @@ const HomeScreen = ({navigation}) => {
                             guestNumber: '4',
                             checkinDate: '2023-12-12',
                             checkoutDate: '2023-12-15',
-                            currency: 'USD',
+                            domain: 'US',
                         })}>
                             <Image
                                 style={styles.card_image}

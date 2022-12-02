@@ -6,12 +6,17 @@ import {
     ScrollView,
     Dimensions,
     FlatList,
+    Button,
     ActivityIndicator,
     TouchableOpacity,
+    SafeAreaView,
+    RefreshControl,
     StyleSheet 
 } from 'react-native'
+import DatePicker from 'react-native-date-picker'
 import {useDispatch, useSelector} from 'react-redux'
 import LinearGradient from 'react-native-linear-gradient'
+import Moment from 'moment'
 
 import {
     getHotelDetail,
@@ -22,8 +27,12 @@ const HotelDetailScreen = ({
     navigation,
     route
 }) => {
-    const { hotelId, guestNumber, checkinDate, checkoutDate, currency } = route.params
+    const { hotelId, guestNumber, checkinDate, checkoutDate, domain } = route.params
     const [refreshing, setRefreshing] = useState(false)
+    const [modalCheckInOpen, setModalCheckInOpen] = useState(false)
+    const [modalCheckOutOpen, setModalCheckOutOpen] = useState(false)
+    const [checkInDatePicker, setCheckInDatePicker] = useState(Moment(checkinDate).toDate())
+    const [checkOutDatePicker, setCheckOutDatePicker] = useState(Moment(checkoutDate).toDate())
     const [hotel, setHotel] = useState({
         'summary': {
             'name': '',
@@ -51,7 +60,7 @@ const HotelDetailScreen = ({
             }],
         }
     })
-    const [rooms, setHotelRooms] = useState({
+    const [hotelRooms, setHotelRooms] = useState({
         'units' : [{
             'id': '',
             'header': {
@@ -74,44 +83,79 @@ const HotelDetailScreen = ({
             }]
         }]
     })
-    const diffDate = (new Date(checkoutDate) - new Date(checkinDate)) / (1000 * 3600 * 24)
+    const diffDate = (checkOutDatePicker - checkInDatePicker) / (1000 * 3600 * 24)
     const sliceState = useSelector((state) => state.booking)
+    const roomState = useSelector((state) => state.booking.hotelRooms)
     const dispatch = useDispatch()
 
+    const dispatchHotelRoomsData = async () => {
+        return dispatch => dispatch(getHotelsRoom(hotelId, checkInDatePicker, checkOutDatePicker, guestNumber))
+    }
+
+    const actions = () => {
+        return dispatch => {
+            dispatch(getHotelDetail({
+                hotelId,
+                domain
+            }))
+            dispatch(getHotelsRoom({
+            hotelId, 
+            checkinDate, 
+            checkoutDate, 
+            guestNumber
+            }))
+            return Promise.resolve()
+        }
+    }
+
     useEffect(() => {
-        // console.log('diffdate ', diffDate)
         dispatch(getHotelDetail({
             hotelId,
-            currency
-        }))
-        dispatch(getHotelsRoom({
-            hotelId,
-            guestNumber,
-            checkinDate,
-            checkoutDate,
-            currency
-        }))
-        console.log('hotel Room ', rooms)
-        console.log('hotel ', hotel)
+            domain
+        })).then(() => {
+            setHotel(sliceState.hotel)
+        }).then(() => {
+            dispatch(getHotelsRoom({
+            hotelId, 
+            checkinDate, 
+            checkoutDate, 
+            guestNumber
+            }))
+        }).then(() => {
+            setHotelRooms(roomState)
+        }).then(() => {
+            onRefresh()
+        })
+        // setHotel(sliceState.hotelDetail)
+        // setHotelRooms(roomState)
+        // setRefreshing(false)
     }, [])
 
     useEffect(() => {
         setHotel(sliceState.hotelDetail)
+        console.log('hotelDetail', hotel)
+    }, [sliceState.hotelDetail])
+
+    useEffect(() => {
         setHotelRooms(sliceState.hotelRooms)
-        console.log('hotel Room ', rooms)
-        console.log('hotel ', hotel)
+        console.log('hotelRooms', hotelRooms)
     }, [sliceState])
 
-    const handlePress = (price, roomId) => {
+    const handlePress = (price, roomId, roomName) => {
+        const checkInString = Moment(checkInDatePicker).format('YYYY-MM-DD');
+        const checkOutString = Moment(checkOutDatePicker).format('YYYY-MM-DD');
         navigation.navigate('Book Room', {
             price: price,
-            currency: currency,
-            checkIn: checkinDate,
-            checkOut: checkoutDate,
+            domain: domain,
+            checkIn: checkInString,
+            checkOut: checkOutString,
             days: diffDate,
             guest: guestNumber,
             hotelId: hotelId,
+            hotelName: hotel.summary?.name,
+            hotelAddress: hotel.summary?.location.address.addressLine,
             roomId: roomId,
+            roomName: roomName
         })
     }
 
@@ -119,21 +163,23 @@ const HotelDetailScreen = ({
         setRefreshing(true)
         dispatch(getHotelDetail({
             hotelId,
-            currency
+            domain
         }))
+        const checkInString = Moment(checkInDatePicker).format('YYYY-MM-DD');
+        const checkOutString = Moment(checkOutDatePicker).format('YYYY-MM-DD');
         dispatch(getHotelsRoom({
             hotelId,
             guestNumber,
-            checkinDate,
-            checkoutDate,
-            currency
+            checkInString,
+            checkOutString,
+            domain
         }))
         setRefreshing(false)
     }
 
     return (
        <View style={styles.container}>
-         {sliceState.isPending ? (
+         {sliceState.isLoading && refreshing == true ? (
             <View style={{
                 flex: 1,
                 justifyContent: 'center',
@@ -142,12 +188,20 @@ const HotelDetailScreen = ({
                 <ActivityIndicator size="large" color="#0000ff" />
             </View>
          ) : (
-            <ScrollView>
+            <ScrollView
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />
+                }
+            >
+                
                 <View>
                     <View style={styles.header}>
                         <Image
                             style={styles.imageHeader}
-                            source={{uri: hotel.propertyGallery?.images[0]?.image?.url}}
+                            source={{uri: hotel?.propertyGallery?.images[0]?.image?.url}}
                         />
                         <LinearGradient
                             colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.5)']}
@@ -155,18 +209,95 @@ const HotelDetailScreen = ({
                         >
                             <View style={styles.hotelSummaryInfo}>
                                 <View style={styles.hotelNameAddress}>
-                                    <Text style={styles.hotelName}>{hotel.summary?.name}</Text>
-                                    <Text style={styles.hotelAddress}>{hotel.summary?.location.address.addressLine}</Text>
+                                    <Text style={styles.hotelName}>{hotel?.summary?.name}</Text>
+                                    <Text style={styles.hotelAddress}>{hotel?.summary?.location.address.addressLine}</Text>
                                 </View>
                                 {/* <Text style={styles.hotelPrice}>{hotel.featuredPrice.currentPrice.formatted}</Text> */}
                             </View>
                         </LinearGradient>
                     </View>
                     <View style={styles.body}>
+                        {/* <View style={{flex: 2, flexDirection: 'row', }}>
+                            <TouchableOpacity
+                            style={{
+                                padding: 8,
+                                flex: 1,
+                                borderColor: '#512fb5',
+                                borderWidth: 1,
+                                borderRadius: 8,
+                                marginRight: 8
+                            }}
+                            onPress={() => setModalCheckInOpen(true)}>
+                                <DatePicker
+                                    modal
+                                    mode="date"
+                                    open={modalCheckInOpen}
+                                    date={checkInDatePicker}
+                                    onConfirm={(date) => {
+                                        setModalCheckInOpen(false)
+                                        setCheckInDatePicker(Moment(date).toDate())
+                                        const checkInString = Moment(checkInDatePicker).format('YYYY-MM-DD');
+                                        const checkOutString = Moment(checkOutDatePicker).format('YYYY-MM-DD');
+                                        dispatchHotelRoomsData()
+                                        dispatch(getHotelsRoom({
+                                            hotelId,
+                                            guestNumber,
+                                            checkInString,
+                                            checkOutString,
+                                            domain
+                                        })) // update ruangan
+                                        // setHotelRooms(roomState) // data ruangannya
+                                    }}
+                                    onCancel={() => {
+                                        setModalCheckInOpen(false)
+                                    }}
+                                />
+                                <Text style={{ fontSize: 12 }}>Check-In Date</Text>
+                                <Text style={{fontFamily: 'Poppins-SemiBold'}}>{Moment(checkInDatePicker).format('DD-MM-YYYY')}</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                            style={{
+                                padding: 8,
+                                flex: 1,
+                                borderColor: '#512fb5',
+                                borderWidth: 1,
+                                borderRadius: 8,
+                                marginLeft: 8
+                            }}
+                            onPress={() => setModalCheckOutOpen(true)}>
+                                <DatePicker
+                                    modal
+                                    mode="date"
+                                    open={modalCheckOutOpen}
+                                    date={checkOutDatePicker}
+                                    onConfirm={(date) => {
+                                        setModalCheckOutOpen(false)
+                                        setCheckOutDatePicker(Moment(date).toDate())
+                                        const checkInString = Moment(checkInDatePicker).format('YYYY-MM-DD');
+                                        const checkOutString = Moment(checkOutDatePicker).format('YYYY-MM-DD');
+                                        console.log('checkInString', checkInString)
+                                        console.log('checkOutString', checkOutString)
+                                        dispatch(getHotelsRoom({
+                                            hotelId,
+                                            guestNumber,
+                                            checkInString,
+                                            checkOutString,
+                                            domain
+                                        }))
+                                    }}
+                                    onCancel={() => {
+                                        setModalCheckOutOpen(false)
+                                    }}
+                                />
+                                <Text style={{ fontSize: 12 }}>Check-Out Date</Text>
+                                <Text style={{fontFamily: 'Poppins-SemiBold'}}>{Moment(checkOutDatePicker).format('DD-MM-YYYY')}</Text>
+                            </TouchableOpacity>
+                        </View> */}
                         <View style={styles.detail}>
                             <Text style={styles.subHeading}>Checkin Instructions</Text>
                             <FlatList
-                                data={hotel.summary?.policies.checkinInstructions}
+                                data={hotel?.summary?.policies.checkinInstructions}
                                 renderItem={({item}) => (
                                     <Text style={styles.detailText}>- {item}</Text>
                                 )}
@@ -174,7 +305,7 @@ const HotelDetailScreen = ({
 
                             <Text style={styles.subHeading}>Child and Bed</Text>
                             <FlatList
-                                data={hotel.summary?.policies.childAndBed.body}
+                                data={hotel?.summary?.policies.childAndBed.body}
                                 renderItem={({item}) => (
                                     <Text style={styles.detailText}>- {item}</Text>
                                 )}
@@ -182,7 +313,7 @@ const HotelDetailScreen = ({
 
                             <Text style={styles.subHeading}>We Should Mention:</Text>
                             <FlatList
-                                data={hotel.summary?.policies.shouldMention.body}
+                                data={hotel?.summary?.policies.shouldMention.body}
                                 renderItem={({item}) => (
                                     <Text style={styles.detailText}>- {item}</Text>
                                 )}
@@ -192,47 +323,57 @@ const HotelDetailScreen = ({
                         </View>
 
                         <ScrollView horizontal={true}>
-                            <FlatList
-                            horizontal
-                            style={{
-                                width: Dimensions.get('window').width,
-                                marginBottom: 28
-                            }}
-                                data={rooms.units}
-                                keyExtractor={(item) => item.id}
-                                renderItem={({item}) => {
-                                    return (
-                                        <TouchableOpacity onPress={() => handlePress(item?.ratePlans[0]?.priceDetails[0]?.price?.total?.amount, item.id)}>
-                                            <View style={styles.roomContainer}>
-                                                <Image
-                                                    style={styles.roomImage}
-                                                    source={{uri: item.unitGallery.gallery[0]?.image.url}}
-                                                />
-                                                <LinearGradient
-                                                colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.5)']}
-                                                style={{flex: 1, position: 'absolute', left: 0, right: 0, top: 0, height: '100%', borderRadius: 8}}
-                                                >
-                                                    <View style={styles.roomInfo}>
-                                                        <Text style={styles.roomName}>{item.header.text}</Text>
-                                                        <Text style={styles.roomPrice}>{item.ratePlans[0]?.priceDetails[0].totalPriceMessage}</Text>
+                            <View>
+                                {sliceState.isLoading ? (
+                                    <ActivityIndicator size="large" color="#512fb5" />
+                                ):(
+                                    <FlatList
+                                    horizontal
+                                    style={{
+                                        width: Dimensions.get('window').width,
+                                        marginBottom: 28,
+                                        paddingRight: 28
+                                    }}
+                                        data={hotelRooms?.units} 
+                                        // keyExtractor={(item) => item.id}
+                                        extraData={sliceState}
+                                        renderItem={({item}) => {
+                                            return (
+                                                <TouchableOpacity
+                                                disabled={item?.ratePlans.length > 0 ? false : true}
+                                                onPress={() => handlePress(item?.ratePlans[0]?.priceDetails[0]?.price?.total?.amount, item?.id, item?.header.text)}>
+                                                    <View style={styles.roomContainer}>
+                                                        <Image
+                                                            style={[styles.roomImage, {opacity: item?.ratePlans.length > 0 ? 1 : 0.5}]}
+                                                            source={{uri: item.unitGallery.gallery[0]?.image.url}}
+                                                        />
+                                                        <LinearGradient
+                                                        colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.5)']}
+                                                        style={{flex: 1, position: 'absolute', left: 0, right: 0, top: 0, height: '100%', borderRadius: 8}}
+                                                        >
+                                                            <View style={styles.roomInfo}>
+                                                                <Text style={styles.roomName}>{item.header.text}</Text>
+                                                                <Text style={styles.roomPrice}>{item.ratePlans[0]?.priceDetails[0].totalPriceMessage}</Text>
+                                                            </View>
+                                                        </LinearGradient>
                                                     </View>
-                                                </LinearGradient>
+                                                </TouchableOpacity>
+                                            )
+                                        }}
+                                        ListEmptyComponent={() => (
+                                            <View style={{
+                                                flex: 1,
+                                                justifyContent: 'center',
+                                                alignItems: 'center'
+                                            }}>
+                                                <Text>No Room Available</Text>
                                             </View>
-                                        </TouchableOpacity>
-                                    )
-                                }}
-                                ListEmptyComponent={() => (
-                                    <View style={{
-                                        flex: 1,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }}>
-                                        <Text>No Room Available</Text>
-                                    </View>
+                                        )}
+                                        refreshing={refreshing}
+                                        onRefresh={onRefresh}
+                                    />
                                 )}
-                                refreshing={refreshing}
-                                onRefresh={onRefresh}
-                            />
+                            </View>
                         </ScrollView>
                     </View>
                 </View>
@@ -247,7 +388,7 @@ const styles = StyleSheet.create({
         flex: 1
     },
     header: {
-
+        marginBottom: 16
     },
     imageHeader: {
         width: '100%',
@@ -299,7 +440,7 @@ const styles = StyleSheet.create({
     },
     roomContainer: {
         width: Dimensions.get('window').width / 3,
-        backgroundColor: 'red',
+        backgroundColor: 'white',
         borderRadius: 8,
         marginRight: 8,
     },
@@ -328,7 +469,7 @@ const styles = StyleSheet.create({
 //     guestNumber: '4',
 //     checkinDate: '2022-12-12',
 //     checkoutDate: '2022-12-15',
-//     currency: 'USD'
+//     domain: 'USD'
 // }
 
 export default HotelDetailScreen

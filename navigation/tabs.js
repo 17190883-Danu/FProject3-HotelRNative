@@ -10,7 +10,10 @@ import SettingScreen from './screens/SettingScreen';
 import LoginScreen from './screens/LoginScreen';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { authLogin } from '../../features/service/handleAuth';
+import {
+    authLogin,
+    checkSession
+} from '../features/service/handleAuth';
 
 const Tab = createBottomTabNavigator();
 
@@ -21,24 +24,23 @@ const Tabs = () => {
     const dispatch = useDispatch()
     
     const checkUserSession = async () => {
-        await AsyncStorage.getItem('session')
-        .then((res) => {
-            if(res !== null) {
-                setUserSession(res)
-            } else {
-                setUserSession(null)
-            }
-            // console.log('sessionHere ', res)
-            return res
-        })
+        const getSession = await AsyncStorage.getItem('session')
+        if(getSession !== null) {
+            setUserSession(res)
+        } else {
+            setUserSession(null)
+        }
+        // console.log('sessionHere ', res)
+        return getSession
     }
 
     useEffect(() => {
-        checkUserSession();
+        dispatch(checkSession())
     }, []);
 
     useEffect(() => {
-        checkUserSession()
+        setUserSession(userState.session)
+        // console.log('userState ', userState.session)
     }, [userState])
 
     return(
@@ -95,7 +97,7 @@ const Tabs = () => {
             }}/>
 
             {/* NAV PROFIL & LOGIN */}
-            {userSession !== null ? (
+            {userSession !== {} ? (
                 <Tab.Screen name="Profil" component={ProfilScreen} options={{
                 tabBarIcon: ({focused}) => (
                     <View style={{alignItems: 'center', justifyContent: 'center', top: 10, paddingBottom: 12,}}>
@@ -133,7 +135,7 @@ const Tabs = () => {
             )}
 
             {/* NAV SETTING */}
-            <Tab.Screen name="Setting" component={SettingScreen} options={{
+            {/* <Tab.Screen name="Setting" component={SettingScreen} options={{
                 tabBarIcon: ({focused}) => (
                     <View style={{alignItems: 'center', justifyContent: 'center', top: 10, paddingBottom: 12,}}>
                         <Image 
@@ -145,10 +147,9 @@ const Tabs = () => {
                                 tintColor: focused ? '#e32f45' : '#748c94',
                             }}
                         />
-                        {/* <Text style={{color: focused ? '#e32f45' : '#748c94', fontSize: 12}}>Setting</Text> */}
                     </View>
                 )
-            }}/>
+            }}/> */}
 
         </Tab.Navigator>
     );
