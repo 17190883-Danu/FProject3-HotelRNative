@@ -9,6 +9,7 @@ const initialState = {
     loginMessage: '',
     session: {},
     user: {},
+    newLoggedData: {},
 }
 
 // bcrypt.setRandomFallback((len) => {
@@ -211,6 +212,7 @@ const handleAuth = createSlice({
             state.isLoggedIn = false
             state.session = {}
             state.user = action.payload
+            state.newLoggedData = action.payload
         })
         builder.addCase(changeAuthProfile.rejected, (state, action) => {
             state.isLoginPending = false

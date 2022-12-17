@@ -28,6 +28,7 @@ const LoginScreen = ({navigation}) => {
     const handleLogin = () => {
         dispatch(authLogin({email, password}))
         setPassword('')
+        navigation.navigate('main', { screen: 'Home' })
     }
 
     useEffect(() => {

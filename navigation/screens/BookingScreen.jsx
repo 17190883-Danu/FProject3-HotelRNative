@@ -56,8 +56,10 @@ const BookingScreen = ({navigation, route}) => {
     }, [bookingState.currency])
 
     useEffect(() => {
+        console.log('s ',authState.user)
         setUserData(authState.user)
-        setFullName(`${authState.user.first_name} ${authState.user.last_name}`)
+        authState.user !== undefined ? setFullName(`${authState.user.first_name} ${authState.user.last_name}`) : setFullName(`${authState.newLoggedData.first_name} ${authState.newLoggedData.last_name}`)
+        // setFullName(`${authState.user.first_name} ${authState.user.last_name}`)
         setPhoneNumber(authState.user.phone_number)
     }, [authState])
 

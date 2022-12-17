@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, StyleSheet } from "react-native";
+import { View, Text, Button, StyleSheet, ScrollView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
     GhostButton
@@ -59,51 +59,53 @@ const ProfilScreen = ({navigation}) => {
     }
 
     return (
-        <View style={styles.container}>
-            {/* <Text>Profil Nih</Text> */}
-            <Text style={styles.sectionTitle}>Profile</Text>
-            <GhostButton
-                label="Booking History"
-                icon={require('../../assets/icons/history.png')}
-                onPress={() => navigation.navigate('Booking History')}
-            />
-            <Text style={styles.sectionTitle}>Settings</Text>
-            <GhostButton
-                label='First Name'
-                icon={require('../../assets/icons/profil.png')}
-                value={userData && userData.first_name}
-                onPress={() => handleOnpress('First Name', userData && userData.first_name, 'first_name')}
-            />
-            <GhostButton
-                label='Last Name'
-                icon={require('../../assets/icons/profil.png')}
-                value={userData && userData.last_name}
-                onPress={() => handleOnpress('Last Name', userData && userData.last_name, 'last_name')}
-            />
-            <GhostButton
-                label='Email'
-                icon={require('../../assets/icons/alternate-email-rounded.png')}
-                value={userData && userData.email}
-                onPress={() => handleOnpress('Email', userData && userData.email, 'email')}
-            />
-            <GhostButton
-                label='Phone Number'
-                icon={require('../../assets/icons/Phone.png')}
-                value={userData && `${getDialCode(userData.dial_code)} ${userData.phone_number}`}
-                onPress={() => handleOnpress('Phone Number', userData && userData.phone_number, 'phone_number')}
-            />
-            {/* <GhostButton
-                label='Phone Number'
-                icon={require('../../assets/icons/phone.png')}
-                value={sessionData && JSON.parse(sessionData).last_name}
-            /> */}
-            <Text style={styles.sectionTitle}>Danger Area</Text>
-            <GhostButton
-                label='Log Out'
-                type='danger'
-                onPress={handleLogout}
-            />
-        </View>
+        <ScrollView>
+            <View style={styles.container}>
+                {/* <Text>Profil Nih</Text> */}
+                <Text style={styles.sectionTitle}>Profile</Text>
+                <GhostButton
+                    label="Booking History"
+                    icon={require('../../assets/icons/history.png')}
+                    onPress={() => navigation.navigate('Booking History')}
+                />
+                <Text style={styles.sectionTitle}>Settings</Text>
+                <GhostButton
+                    label='First Name'
+                    icon={require('../../assets/icons/profil.png')}
+                    value={userData && userData.first_name}
+                    onPress={() => handleOnpress('First Name', userData && userData.first_name, 'first_name')}
+                />
+                <GhostButton
+                    label='Last Name'
+                    icon={require('../../assets/icons/profil.png')}
+                    value={userData && userData.last_name}
+                    onPress={() => handleOnpress('Last Name', userData && userData.last_name, 'last_name')}
+                />
+                <GhostButton
+                    label='Email'
+                    icon={require('../../assets/icons/alternate-email-rounded.png')}
+                    value={userData && userData.email}
+                    onPress={() => handleOnpress('Email', userData && userData.email, 'email')}
+                />
+                <GhostButton
+                    label='Phone Number'
+                    icon={require('../../assets/icons/Phone.png')}
+                    value={userData && `${getDialCode(userData.dial_code)} ${userData.phone_number}`}
+                    onPress={() => handleOnpress('Phone Number', userData && userData.phone_number, 'phone_number')}
+                />
+                {/* <GhostButton
+                    label='Phone Number'
+                    icon={require('../../assets/icons/phone.png')}
+                    value={sessionData && JSON.parse(sessionData).last_name}
+                /> */}
+                <Text style={styles.sectionTitle}>Danger Area</Text>
+                <GhostButton
+                    label='Log Out'
+                    type='danger'
+                    onPress={handleLogout}
+                />
+            </View>
+        </ScrollView>
     );
 };
 

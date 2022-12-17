@@ -39,9 +39,10 @@ const Tabs = () => {
     }, []);
 
     useEffect(() => {
+        // dispatch(checkSession())
         setUserSession(userState.session)
-        // console.log('userState ', userState.session)
-    }, [userState])
+        console.log('userState ', userState.session)
+    }, [userState.session])
 
     return(
         <Tab.Navigator
@@ -97,7 +98,7 @@ const Tabs = () => {
             }}/>
 
             {/* NAV PROFIL & LOGIN */}
-            {userSession !== {} ? (
+            {userState.session !== undefined ? (
                 <Tab.Screen name="Profil" component={ProfilScreen} options={{
                 tabBarIcon: ({focused}) => (
                     <View style={{alignItems: 'center', justifyContent: 'center', top: 10, paddingBottom: 12,}}>
